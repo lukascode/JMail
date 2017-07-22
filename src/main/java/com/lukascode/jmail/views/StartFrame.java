@@ -6,13 +6,12 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -27,8 +26,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 
 import com.lukascode.jmail.common.AccountConfiguration;
-import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
+import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
 import com.lukascode.jmail.views.helpers.SimpleLinkLabel;
 
@@ -93,9 +92,12 @@ public class StartFrame extends JFrame {
 		menuBar.add(menuFile);
 		
 		menuItemImportSettings = new JMenuItem("Import Settings");
+		
+		menuItemImportSettings.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/import.png")));
 		menuFile.add(menuItemImportSettings);
 		
 		menuItemExit = new JMenuItem("Exit");
+		menuItemExit.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/exit.png")));
 		
 		menuFile.add(menuItemExit);
 		
@@ -103,6 +105,7 @@ public class StartFrame extends JFrame {
 		menuBar.add(menuHelp);
 		
 		menuItemAbout = new JMenuItem("About");
+		menuItemAbout.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/about.png")));
 		menuHelp.add(menuItemAbout);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -179,6 +182,23 @@ public class StartFrame extends JFrame {
 		contentPane.setLayout(gl_contentPane);
 	}
 	private void setEvents() {
+		
+		menuItemImportSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				int returnVal = chooser.showOpenDialog(null);
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					String filepath = chooser.getSelectedFile().getAbsolutePath();
+					if(filepath != null) {
+						JMailDatabaseCreator.createInstance(filepath);
+						accountsTable.setModel(new AccountsTableModel
+								(new AccountConfigurationDAO().getAccounts()));
+					}
+				}
+			}
+		});
+		
 		buttonLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new AppFrame().setVisible(true);

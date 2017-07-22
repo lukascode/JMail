@@ -57,7 +57,6 @@ public class AccountsTableModel extends AbstractTableModel {
 	
 	public void updateRow(AccountConfiguration ac, int idx) {
 		if(acdao.update(ac)) {
-			System.out.println("Update success");
 			accounts.set(idx, ac);
 			fireTableRowsUpdated(idx, idx);
 		}

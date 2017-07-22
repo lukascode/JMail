@@ -86,7 +86,7 @@ public class AccountDialogForm extends JDialog {
 	
 	public void initComponents() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AccountDialogForm.class.getResource("/icons/email.png")));
-		setTitle("Add new account");
+		setTitle("Account Configuration");
 		setBounds(100, 100, 866, 558);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -330,7 +330,6 @@ public class AccountDialogForm extends JDialog {
 	
 	private void fillForm(AccountConfiguration ac) {
 		if(ac == null) return;
-		System.out.println("form change start");
 		textFieldEmail.setText(ac.getEmail());
 		checkBoxSavePassword.setSelected(ac.isSavePassword());
 		textFieldSmtpName.setText(ac.getSmtpServerName());
