@@ -27,6 +27,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 
 import com.lukascode.jmail.common.AccountConfiguration;
+import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
 import com.lukascode.jmail.views.helpers.SimpleLinkLabel;
@@ -178,13 +179,6 @@ public class StartFrame extends JFrame {
 		contentPane.setLayout(gl_contentPane);
 	}
 	private void setEvents() {
-		
-		buttonEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		
 		buttonLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new AppFrame().setVisible(true);
@@ -212,17 +206,29 @@ public class StartFrame extends JFrame {
 				new SimpleLinkLabel(labelConfigureNewAccount, Color.DARK_GRAY, new Color(64, 144, 237)) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				NewAccountDialog ad = NewAccountDialog.create();
-				ad.addWindowListener(new WindowAdapter() {
-					public void windowClosed(WindowEvent e) {
-						AccountConfiguration ac = ad.getResult();
-						if(ac != null) {
-							TableModel model = accountsTable.getModel();
-							AccountsTableModel m = (AccountsTableModel)model;
-							m.addRow(ac);
-						}
+				AccountDialogForm ad = AccountDialogForm.create(null);
+				AccountConfiguration ac = ad.getResult();
+				if(ac != null) {
+					TableModel model = accountsTable.getModel();
+					AccountsTableModel m = (AccountsTableModel)model;
+					m.addRow(ac);
+				}
+			}});
+		
+		buttonEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selected = accountsTable.getSelectedRow();
+				if(selected > -1) {
+					TableModel model = accountsTable.getModel();
+					AccountsTableModel m = (AccountsTableModel)model;
+					AccountConfiguration ac = m.getRow(selected);
+					AccountDialogForm ad = AccountDialogForm.create(ac);
+					AccountConfiguration acUpdated = ad.getResult();
+					if(acUpdated != null) {
+						acUpdated.setId(ac.getId());
+						m.updateRow(acUpdated, selected);
 					}
-				});
+				}
 			}
 		});
 	}

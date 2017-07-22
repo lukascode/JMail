@@ -69,6 +69,10 @@ public class AccountConfigurationDAO {
 			pstmt.setString(12, ac.getLastLoginFormated());
 			int i = pstmt.executeUpdate();
 			if(i <= 0) result = false;
+			else {
+				ResultSet rs = pstmt.getGeneratedKeys();
+				ac.setId(rs.getInt(1));
+			}
 		} catch(SQLException e) {
 			Main.logger.severe(e.getMessage());
 			result = false;
@@ -77,6 +81,7 @@ public class AccountConfigurationDAO {
 	}
 	
 	public boolean update(AccountConfiguration ac) {
+		if(ac == null) return false;
 		boolean result = true;
 		String sql =   "UPDATE account_configuration SET email = ?, "
 					 + "password = ?, save_password = ?, smtp_server_name = ?, "

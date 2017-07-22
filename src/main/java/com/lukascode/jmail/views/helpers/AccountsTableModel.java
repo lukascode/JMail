@@ -44,10 +44,22 @@ public class AccountsTableModel extends AbstractTableModel {
 		return (column == 0)?"Email":"Last login";
 	}
 	
+	public AccountConfiguration getRow(int idx) {
+		return accounts.get(idx);
+	}
+	
 	public void addRow(AccountConfiguration ac) {
 		if(acdao.insert(ac)) {
 			accounts.add(ac);
 			fireTableRowsInserted(0, getRowCount());
+		}
+	}
+	
+	public void updateRow(AccountConfiguration ac, int idx) {
+		if(acdao.update(ac)) {
+			System.out.println("Update success");
+			accounts.set(idx, ac);
+			fireTableRowsUpdated(idx, idx);
 		}
 	}
 	
@@ -58,6 +70,5 @@ public class AccountsTableModel extends AbstractTableModel {
 		}
 		fireTableRowsDeleted(row, row);
 	}
-	
 
 }

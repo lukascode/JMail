@@ -27,7 +27,7 @@ import com.lukascode.jmail.common.AccountConfiguration;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
 
-public class NewAccountDialog extends JDialog {
+public class AccountDialogForm extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JButton cancelButton;
@@ -54,18 +54,19 @@ public class NewAccountDialog extends JDialog {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		create();
+		create(null);
 	}
 	
-	public static NewAccountDialog create() {
-		NewAccountDialog dialog = null;
+	public static AccountDialogForm create(AccountConfiguration ac) {
+		AccountDialogForm dialog = null;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
-			dialog = new NewAccountDialog();
+			dialog = new AccountDialogForm();
+			dialog.fillForm(ac);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -77,15 +78,15 @@ public class NewAccountDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public NewAccountDialog() {
+	public AccountDialogForm() {
+		setModal(true);
 		initComponents();
 		setEvents();
 	}
 	
 	public void initComponents() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(NewAccountDialog.class.getResource("/icons/email.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AccountDialogForm.class.getResource("/icons/email.png")));
 		setTitle("Add new account");
-		setModal(true);
 		setBounds(100, 100, 866, 558);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -265,12 +266,11 @@ public class NewAccountDialog extends JDialog {
 	public void setEvents() {
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				NewAccountDialog.this.dispose();
+				AccountDialogForm.this.dispose();
 			}
 		});
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AccountConfigurationDAO acdao = new AccountConfigurationDAO();
 				AccountConfiguration ac = new AccountConfiguration();
 				String email = textFieldEmail.getText();
 				String password = new String(textFieldPassword.getPassword());
@@ -291,7 +291,7 @@ public class NewAccountDialog extends JDialog {
 					labelError.setText("Email is not valid");
 					return;
 				}
-				if(password.length() < 6) {
+				if(password.length() < 6 && checkBoxSavePassword.isSelected()) {
 					labelError.setText("Password is too short (minimum 6 characters)");
 					return;
 				}
@@ -323,8 +323,23 @@ public class NewAccountDialog extends JDialog {
 				ac.setImapServerSSL(imapSSL);
 				ac.setImapServerTLS(imapTLS);
 				result = ac;
-				NewAccountDialog.this.dispose();
+				AccountDialogForm.this.dispose();
 			}
 		});
+	}
+	
+	private void fillForm(AccountConfiguration ac) {
+		if(ac == null) return;
+		System.out.println("form change start");
+		textFieldEmail.setText(ac.getEmail());
+		checkBoxSavePassword.setSelected(ac.isSavePassword());
+		textFieldSmtpName.setText(ac.getSmtpServerName());
+		textFieldSmtpPort.setText(ac.getSmtpServerPort());
+		checkBoxSmtpSSL.setSelected(ac.isSmtpServerSSL());
+		checkBoxSmtpTls.setSelected(ac.isSmtpServerTLS());
+		textFieldImapName.setText(ac.getImapServerName());
+		textFieldImapPort.setText(ac.getImapServerPort());
+		checkBoxImapSSL.setSelected(ac.isImapServerSSL());
+		checkBoxImapTls.setSelected(ac.isImapServerTLS());
 	}
 }
