@@ -66,10 +66,7 @@ public class AccountConfigurationDAO {
 			pstmt.setString(9, ac.getImapServerPort());
 			pstmt.setInt(10, (ac.isImapServerSSL()?1:0));
 			pstmt.setInt(11, (ac.isImapServerTLS()?1:0));
-			LocalDateTime dt = ac.getLastLogin();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String lastLogin = dt.format(formatter);
-			pstmt.setString(12, lastLogin);
+			pstmt.setString(12, ac.getLastLoginFormated());
 			int i = pstmt.executeUpdate();
 			if(i <= 0) result = false;
 		} catch(SQLException e) {
@@ -101,10 +98,7 @@ public class AccountConfigurationDAO {
 			pstmt.setString(9, ac.getImapServerPort());
 			pstmt.setInt(10, (ac.isImapServerSSL()?1:0));
 			pstmt.setInt(11, (ac.isImapServerTLS()?1:0));
-			LocalDateTime dt = ac.getLastLogin();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String lastLogin = dt.format(formatter);
-			pstmt.setString(12, lastLogin);
+			pstmt.setString(12, ac.getLastLoginFormated());
 			pstmt.setInt(13, ac.getId());
 			int i = pstmt.executeUpdate();
 			if(i <= 0) result = false;
@@ -145,10 +139,7 @@ public class AccountConfigurationDAO {
 		ac.setImapServerPort(rs.getString("imap_server_port"));
 		ac.setImapServerSSL((rs.getInt("imap_server_ssl")==1)?true:false);
 		ac.setImapServerTLS((rs.getInt("imap_server_tls")==1)?true:false);
-		String lastLogin = rs.getString("last_login");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		LocalDateTime ldt = LocalDateTime.parse(lastLogin, formatter);
-		ac.setLastLogin(ldt);
+		ac.setLastLoginFormated(rs.getString("last_login"));
 		return ac;
 	}
 	

@@ -1,25 +1,30 @@
 package com.lukascode.jmail.views.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
 
-public class AccountsTableModel extends AbstractTableModel {
+import com.lukascode.jmail.common.AccountConfiguration;
+import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 
-	private Object[][] values;
+public class AccountsTableModel extends AbstractTableModel {
+	
+	private static AccountConfigurationDAO acdao = new AccountConfigurationDAO();
+	
+	private List<AccountConfiguration> accounts;
+	
+	public AccountsTableModel(List<AccountConfiguration> accounts) {
+		this.accounts = accounts;
+	}
 	
 	public AccountsTableModel() {
-		values = new String[4][2];
-		values[0][0] = "***REMOVED***";
-		values[0][1] = "12.08.2017 16:40";
-		values[1][0] = "lukasz.sakowicz@lukascodeweb.pl";
-		values[1][1] = "12.08.2017 16:40";
-		values[2][0] = "lukato@gmail.com";
-		values[2][1] = "12.08.2017 16:40";
+		accounts = new ArrayList<>();
 	}
 	
 	@Override
 	public int getRowCount() {
-		//return values.length;
-		return 20;
+		return accounts.size();
 	}
 
 	@Override
@@ -29,14 +34,30 @@ public class AccountsTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		//return values[rowIndex][columnIndex];
-		if(columnIndex == 0) return "somefunnyemail";
-		return "date";
+		AccountConfiguration ac = accounts.get(rowIndex);
+		if(columnIndex == 0) return ac.getEmail();
+		return ac.getLastLoginFormated();
 	}
 	
 	@Override
 	public String getColumnName(int column) {
-		return (column == 0)?"email":"last login";
+		return (column == 0)?"Email":"Last login";
 	}
+	
+	public void addRow(AccountConfiguration ac) {
+		if(acdao.insert(ac)) {
+			accounts.add(ac);
+			fireTableRowsInserted(0, getRowCount());
+		}
+	}
+	
+	public void removeRow(int row) {
+		AccountConfiguration ac = accounts.get(row);
+		if(acdao.delete(ac.getId())) {
+			accounts.remove(row);
+		}
+		fireTableRowsDeleted(row, row);
+	}
+	
 
 }

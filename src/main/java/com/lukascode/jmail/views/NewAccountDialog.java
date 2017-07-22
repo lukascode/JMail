@@ -1,26 +1,31 @@
 package com.lukascode.jmail.views;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import java.awt.Toolkit;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.UIManager;
-import javax.swing.JLabel;
-import java.awt.Font;
-import javax.swing.JSeparator;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import java.awt.Color;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+
+import com.lukascode.jmail.common.AccountConfiguration;
+import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
+import com.lukascode.jmail.views.helpers.AccountsTableModel;
 
 public class NewAccountDialog extends JDialog {
 
@@ -28,29 +33,45 @@ public class NewAccountDialog extends JDialog {
 	private JButton cancelButton;
 	private JButton okButton;
 	private JTextField textFieldEmail;
-	private JPasswordField passwordField;
+	private JPasswordField textFieldPassword;
 	private JTextField textFieldSmtpName;
 	private JTextField textFieldSmtpPort;
 	private JTextField textFieldImapName;
 	private JTextField textFieldImapPort;
 	private JLabel labelError;
+	private JCheckBox checkBoxSavePassword;
+	private JCheckBox checkBoxSmtpSSL;
+	private JCheckBox checkBoxSmtpTls;
+	private JCheckBox checkBoxImapSSL;
+	private JCheckBox checkBoxImapTls;
+	
+	private AccountConfiguration result = null;
+	public AccountConfiguration getResult() {
+		return result;
+	}
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		create();
+	}
+	
+	public static NewAccountDialog create() {
+		NewAccountDialog dialog = null;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
-			NewAccountDialog dialog = new NewAccountDialog();
+			dialog = new NewAccountDialog();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return dialog;
 	}
 
 	/**
@@ -80,9 +101,9 @@ public class NewAccountDialog extends JDialog {
 		
 		JLabel labelPassword = new JLabel("Password:");
 		
-		passwordField = new JPasswordField();
+		textFieldPassword = new JPasswordField();
 		
-		JCheckBox chckbxSavePassword = new JCheckBox("Save Password");
+		checkBoxSavePassword = new JCheckBox("Save Password");
 		
 		JLabel lblSmtpServer = new JLabel("SMTP Server");
 		lblSmtpServer.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -100,10 +121,10 @@ public class NewAccountDialog extends JDialog {
 		
 		JLabel lblDefault = new JLabel("Default: 465");
 		
-		JCheckBox checkBoxSmtpSSL = new JCheckBox("Use secure connection (SSL)");
+		checkBoxSmtpSSL = new JCheckBox("Use secure connection (SSL)");
 		checkBoxSmtpSSL.setSelected(true);
 		
-		JCheckBox checkBoxSmtpTls = new JCheckBox("Use secure authentication");
+		checkBoxSmtpTls = new JCheckBox("Use secure authentication");
 		
 		JLabel lblImapServer = new JLabel("IMAP Server");
 		lblImapServer.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -121,10 +142,10 @@ public class NewAccountDialog extends JDialog {
 		
 		JLabel lblDefault_1 = new JLabel("Default: 993");
 		
-		JCheckBox checkBoxImapSSL = new JCheckBox("Use secure connection (SSL)");
+		checkBoxImapSSL = new JCheckBox("Use secure connection (SSL)");
 		checkBoxImapSSL.setSelected(true);
 		
-		JCheckBox checkBoxImapTls = new JCheckBox("Use secure authentication");
+		checkBoxImapTls = new JCheckBox("Use secure authentication");
 		
 		labelError = new JLabel("");
 		labelError.setForeground(Color.RED);
@@ -145,8 +166,8 @@ public class NewAccountDialog extends JDialog {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(labelPassword)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE))
-						.addComponent(chckbxSavePassword)
+							.addComponent(textFieldPassword, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE))
+						.addComponent(checkBoxSavePassword)
 						.addComponent(lblSmtpServer)
 						.addComponent(checkBoxSmtpSSL)
 						.addComponent(lblImapServer)
@@ -187,9 +208,9 @@ public class NewAccountDialog extends JDialog {
 						.addComponent(labelEmail)
 						.addComponent(textFieldEmail, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(labelPassword)
-						.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(textFieldPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(chckbxSavePassword)
+					.addComponent(checkBoxSavePassword)
 					.addGap(18)
 					.addComponent(lblSmtpServer)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -249,7 +270,60 @@ public class NewAccountDialog extends JDialog {
 		});
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				labelError.setText(labelError.getText() + "Error ");
+				AccountConfigurationDAO acdao = new AccountConfigurationDAO();
+				AccountConfiguration ac = new AccountConfiguration();
+				String email = textFieldEmail.getText();
+				String password = new String(textFieldPassword.getPassword());
+				boolean  savePassword = checkBoxSavePassword.isSelected();
+				String smtpName = textFieldSmtpName.getText();
+				String smtpPort = textFieldSmtpPort.getText();
+				boolean smtpSSL = checkBoxSmtpSSL.isSelected();
+				boolean smtpTLS = checkBoxSmtpTls.isSelected();
+				String imapName = textFieldImapName.getText();
+				String imapPort = textFieldImapPort.getText();
+				boolean imapSSL = checkBoxImapSSL.isSelected();
+				boolean imapTLS = checkBoxImapTls.isSelected();
+				
+				Pattern VALID_EMAIL_ADDRESS_REGEX = 
+						 Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+				Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
+				if(!matcher.find()) {
+					labelError.setText("Email is not valid");
+					return;
+				}
+				if(password.length() < 6) {
+					labelError.setText("Password is too short (minimum 6 characters)");
+					return;
+				}
+				if(smtpName.isEmpty()) {
+					labelError.setText("Smtp server name cannot be empty");
+					return;
+				}
+				if(imapName.isEmpty()) {
+					labelError.setText("Imap server name cannot be empty");
+					return;
+				}
+				try {
+					int port = Integer.parseInt(smtpPort);
+					if(port > 0 && port < 65536) 
+						ac.setSmtpServerPort(smtpPort);
+				} catch(NumberFormatException ex) {}
+				try {
+					int port = Integer.parseInt(imapPort);
+					if(port > 0 && port < 65536) 
+						ac.setImapServerPort(imapPort);
+				} catch(NumberFormatException ex) {}
+				ac.setEmail(email);
+				ac.setPassword(password);
+				ac.setSavePassword(savePassword);
+				ac.setSmtpServerName(smtpName);
+				ac.setSmtpServerSSL(smtpSSL);
+				ac.setSmtpServerTLS(smtpTLS);
+				ac.setImapServerName(imapName);
+				ac.setImapServerSSL(imapSSL);
+				ac.setImapServerTLS(imapTLS);
+				result = ac;
+				NewAccountDialog.this.dispose();
 			}
 		});
 	}

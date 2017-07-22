@@ -1,7 +1,6 @@
 package com.lukascode.jmail.common;
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -20,9 +19,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.swing.JFrame;
 
-import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.MessageViewer;
+import com.lukascode.jmail.views.StartFrame;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.pop3.POP3Store;
 
@@ -207,15 +206,15 @@ public class Main {
 	public static void main(String[] args) {
 		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
 		JMailDatabaseCreator.createInstance("jmail.db");
+		JMailDatabaseCreator.getInstance().createDatabase();
 		EventQueue.invokeLater(()->{
-			//new StartFrame().setVisible(true);
+			StartFrame.main(args);
 		});
 		//new JMailDatabaseCreator("test.db");
 		//new MailHelper().receiveEmailIMAP("***REMOVED***", "pass");
-		JMailDatabaseCreator.getInstance().createDatabase();
-		AccountConfiguration ac = new AccountConfiguration();
-		AccountConfigurationDAO acdao = new AccountConfigurationDAO();
-//		ac.setId(-1);
+//		AccountConfiguration ac = new AccountConfiguration();
+//		AccountConfigurationDAO acdao = new AccountConfigurationDAO();
+//		ac.setId(0);
 //		ac.setEmail("alamakota@gmail.com");
 //		ac.setPassword("password");
 //		ac.setSavePassword(true);
@@ -223,19 +222,16 @@ public class Main {
 //		ac.setSmtpServerPort("465");
 //		ac.setSmtpServerSSL(true);
 //		ac.setImapServerTLS(false);
-//		ac.setImapServerName("smtp.gmail.com");
-//		ac.setImapServerPort("465");
+//		ac.setImapServerName("imap.gmail.com");
+//		ac.setImapServerPort("993");
 //		ac.setImapServerSSL(true);
 //		ac.setImapServerTLS(false);
 //		ac.setLastLogin(LocalDateTime.now());
-//		if(acdao.update(ac))
-//			logger.log(Level.INFO, "updated");
-//		List<AccountConfiguration> accounts = acdao.getAccounts();
-//		accounts.forEach(System.out::println);
-		AccountConfiguration ac2 = acdao.get(6);
-		ac2.setLastLogin(LocalDateTime.now());
-		if(acdao.update(ac2)) 
-			logger.log(Level.INFO, "updated");
+//		if(acdao.insert(ac))
+//			logger.log(Level.INFO, "inserted");
+		
+		
+
 			
 	}
 

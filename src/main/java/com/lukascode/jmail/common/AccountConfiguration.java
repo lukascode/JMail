@@ -1,6 +1,7 @@
 package com.lukascode.jmail.common;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class AccountConfiguration {
 	
@@ -167,11 +168,20 @@ public class AccountConfiguration {
 	public LocalDateTime getLastLogin() {
 		return lastLogin;
 	}
-
-
-
+	
 	public void setLastLogin(LocalDateTime lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+	
+	public String getLastLoginFormated() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String ll = lastLogin.format(formatter);
+		return ll;
+	}
+	
+	public void setLastLoginFormated(String lastLogin) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		this.lastLogin = LocalDateTime.parse(lastLogin, formatter);
 	}
 
 	@Override
@@ -182,5 +192,7 @@ public class AccountConfiguration {
 
 	public AccountConfiguration() {
 		lastLogin = LocalDateTime.now();
+		smtpServerPort = "465";
+		imapServerPort = "993";
 	}
 }
