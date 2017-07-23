@@ -27,7 +27,7 @@ import com.lukascode.jmail.common.AccountConfiguration;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
 
-public class AccountDialogForm extends JDialog {
+public class AccountFormDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JButton cancelButton;
@@ -57,15 +57,15 @@ public class AccountDialogForm extends JDialog {
 		create(null);
 	}
 	
-	public static AccountDialogForm create(AccountConfiguration ac) {
-		AccountDialogForm dialog = null;
+	public static AccountFormDialog create(AccountConfiguration ac) {
+		AccountFormDialog dialog = null;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
-			dialog = new AccountDialogForm();
+			dialog = new AccountFormDialog();
 			dialog.fillForm(ac);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
@@ -78,16 +78,16 @@ public class AccountDialogForm extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public AccountDialogForm() {
+	public AccountFormDialog() {
 		setModal(true);
 		initComponents();
 		setEvents();
 	}
 	
 	public void initComponents() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AccountDialogForm.class.getResource("/icons/email.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AccountFormDialog.class.getResource("/icons/email.png")));
 		setTitle("Account Configuration");
-		setBounds(100, 100, 866, 558);
+		setBounds(100, 100, 850, 542);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -266,7 +266,7 @@ public class AccountDialogForm extends JDialog {
 	public void setEvents() {
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AccountDialogForm.this.dispose();
+				AccountFormDialog.this.dispose();
 			}
 		});
 		okButton.addActionListener(new ActionListener() {
@@ -323,7 +323,7 @@ public class AccountDialogForm extends JDialog {
 				ac.setImapServerSSL(imapSSL);
 				ac.setImapServerTLS(imapTLS);
 				result = ac;
-				AccountDialogForm.this.dispose();
+				AccountFormDialog.this.dispose();
 			}
 		});
 	}

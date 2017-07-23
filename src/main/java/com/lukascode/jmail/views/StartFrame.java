@@ -6,6 +6,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -48,6 +50,8 @@ public class StartFrame extends JFrame {
 	private JButton buttonLogin;
 	private JLabel labelEmailLogo;
 	private JButton buttonEdit;
+	
+	private AppFrame appFrame = null;
 
 	/**
 	 * Launch the application.
@@ -105,6 +109,7 @@ public class StartFrame extends JFrame {
 		menuBar.add(menuHelp);
 		
 		menuItemAbout = new JMenuItem("About");
+		
 		menuItemAbout.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/about.png")));
 		menuHelp.add(menuItemAbout);
 		contentPane = new JPanel();
@@ -177,11 +182,18 @@ public class StartFrame extends JFrame {
 		accountsTable.setRowHeight(22);
 		accountsTable.setShowHorizontalLines(false);
 		accountsTable.setShowVerticalLines(false);
-		accountsTable.setModel(new AccountsTableModel(new AccountConfigurationDAO().getAccounts()));
+		accountsTable.setModel(new AccountsTableModel
+				(new AccountConfigurationDAO().getAccounts()));
 		accountsScrollPane.setViewportView(accountsTable);
 		contentPane.setLayout(gl_contentPane);
 	}
 	private void setEvents() {
+		
+		menuItemAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutDialog.create().setLocationRelativeTo(StartFrame.this);
+			}
+		});
 		
 		menuItemImportSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -201,7 +213,22 @@ public class StartFrame extends JFrame {
 		
 		buttonLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new AppFrame().setVisible(true);
+				int selected = accountsTable.getSelectedRow();
+				if(selected > -1) {
+					TableModel model = accountsTable.getModel();
+					AccountsTableModel m = (AccountsTableModel)model;
+					AccountConfiguration ac = m.getRow(selected);
+					if(appFrame == null) {
+						appFrame = AppFrame.create();
+						appFrame.addWindowListener(new WindowAdapter() {
+							@Override
+							public void windowClosed(WindowEvent e) {
+								appFrame = null;
+							}
+						});
+					}
+					appFrame.addTab(new MailContentViewerPanel(ac), ac.getEmail());
+				}
 			}
 		});
 		
@@ -226,7 +253,8 @@ public class StartFrame extends JFrame {
 				new SimpleLinkLabel(labelConfigureNewAccount, Color.DARK_GRAY, new Color(64, 144, 237)) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				AccountDialogForm ad = AccountDialogForm.create(null);
+				AccountFormDialog ad = AccountFormDialog.create(null);
+				ad.setLocationRelativeTo(StartFrame.this);
 				AccountConfiguration ac = ad.getResult();
 				if(ac != null) {
 					TableModel model = accountsTable.getModel();
@@ -242,7 +270,8 @@ public class StartFrame extends JFrame {
 					TableModel model = accountsTable.getModel();
 					AccountsTableModel m = (AccountsTableModel)model;
 					AccountConfiguration ac = m.getRow(selected);
-					AccountDialogForm ad = AccountDialogForm.create(ac);
+					AccountFormDialog ad = AccountFormDialog.create(ac);
+					ad.setLocationRelativeTo(StartFrame.this);
 					AccountConfiguration acUpdated = ad.getResult();
 					if(acUpdated != null) {
 						acUpdated.setId(ac.getId());

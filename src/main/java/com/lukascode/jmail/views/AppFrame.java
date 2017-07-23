@@ -16,61 +16,115 @@ import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.GridBagLayout;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.ImageIcon;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class AppFrame extends JFrame {
 
 	private JPanel contentPane;
+	private JTabbedPane tabbedPaneAccounts;
+	private JMenuItem mntmAbout;
+	private JMenuItem mntmFinish;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AppFrame frame = new AppFrame();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		create();
+	}
+	
+	public static AppFrame create() {
+		AppFrame frame = null;
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		frame = new AppFrame();
+		frame.setVisible(true);
+		return frame;
 	}
 
 	/**
 	 * Create the frame.
 	 */
 	public AppFrame() {
+		initComponents();
+		setEvents();
+	}
+	
+	public void initComponents() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AppFrame.class.getResource("/icons/email.png")));
 		setTitle("JMail Client");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 1062, 676);
+		setBounds(100, 100, 1149, 751);
+		
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu menuFile = new JMenu("File");
+		menuBar.add(menuFile);
+		
+		mntmFinish = new JMenuItem("Finish");
+		
+		mntmFinish.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/exit.png")));
+		menuFile.add(mntmFinish);
+		
+		JMenu mnHelp = new JMenu("Help");
+		menuBar.add(mnHelp);
+		
+		mntmAbout = new JMenuItem("About");
+		
+		mntmAbout.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/about.png")));
+		mnHelp.add(mntmAbout);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
-		JLabel lblMainContentHere = new JLabel("Main Content Here");
+		tabbedPaneAccounts = new JTabbedPane(JTabbedPane.TOP);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblMainContentHere)
-					.addContainerGap(946, Short.MAX_VALUE))
+				.addComponent(tabbedPaneAccounts, GroupLayout.DEFAULT_SIZE, 1030, Short.MAX_VALUE)
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblMainContentHere)
-					.addContainerGap(574, Short.MAX_VALUE))
+				.addComponent(tabbedPaneAccounts, GroupLayout.DEFAULT_SIZE, 610, Short.MAX_VALUE)
 		);
 		contentPane.setLayout(gl_contentPane);
 	}
+	
+	public void setEvents() {
+		mntmAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutDialog.create().setLocationRelativeTo(AppFrame.this);
+			}
+		});
+		
+		mntmFinish.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AppFrame.this.dispose();
+			}
+		});
+	}
+	
+	public void addTab(JPanel panel, String title) {
+		tabbedPaneAccounts.addTab(title, panel);
+		tabbedPaneAccounts.setBackground(Color.BLUE);
+	}
+	
+	
 }
