@@ -263,6 +263,7 @@ public class StartFrame extends JFrame {
 				}
 			}});
 		
+		
 		buttonEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selected = accountsTable.getSelectedRow();

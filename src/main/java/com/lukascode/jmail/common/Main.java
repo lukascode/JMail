@@ -12,6 +12,7 @@ import java.util.logging.SimpleFormatter;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.Transport;
@@ -44,7 +45,6 @@ class MailHelper {
 //		props.put("mail.smtp.starttls.enable", "true");
 //		props.put("mail.smtp.host", "smtp.gmail.com");
 //		props.put("mail.smtp.port", "587");
-//		props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 //		props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 		
 		//SSL
@@ -131,17 +131,27 @@ class MailHelper {
 			Properties props = new Properties();
 			props.put("mail.store.protocol", "imaps");
 			props.put("mail.pop3.ssl.enable", "true");
-			Session emailSession = Session.getDefaultInstance(props);
+			
+			
+			Session emailSession = Session.getInstance(props);
+			
+			//also works with it 
+//			Session emailSession = Session.getInstance(props,
+//					  new javax.mail.Authenticator() {
+//						protected PasswordAuthentication getPasswordAuthentication() {
+//							return new PasswordAuthentication(user, password);
+//						}
+//					  });
+			
 			Store store = emailSession.getStore("imaps");
 			store.connect("imap.gmail.com", user, password);
-			IMAPFolder folder = (IMAPFolder) store.getFolder("[Gmail]").getFolder("Wa¿ne");
+			IMAPFolder folder = (IMAPFolder) store.getFolder("[Gmail]");
+			Folder[] folders = folder.list();
+			for(int i=0; i<folders.length; ++i) {
+				System.out.println(folders[i].getName());
+			}
 			
-//			Folder[] folders = folder.list();
-//			for(int i=0; i<folders.length; ++i) {
-//				System.out.println(folders[i].getName());
-//			}
-//			
-//			if(true) return;
+			if(true) return;
 			
 			folder.open(Folder.READ_ONLY);
 			Message[] messages = folder.getMessages();
@@ -230,7 +240,8 @@ public class Main {
 //		if(acdao.insert(ac))
 //			logger.log(Level.INFO, "inserted");
 			
-		
+		//MailHelper mh = new MailHelper();
+		//mh.receiveEmailIMAP("***REMOVED***", "***REMOVED***");
 
 			
 	}

@@ -1,6 +1,7 @@
 package com.lukascode.jmail.views;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -8,20 +9,23 @@ import java.awt.GridBagLayout;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.lukascode.jmail.common.AccountConfiguration;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import java.awt.Color;
+import com.lukascode.jmail.common.MailUtils;
+import com.lukascode.jmail.views.helpers.FolderTreeModel;
+import com.lukascode.jmail.views.helpers.WorkerDialog;
 
 public class MailContentViewerPanel extends JPanel {
 
@@ -30,6 +34,7 @@ public class MailContentViewerPanel extends JPanel {
 	 */
 	
 	private AccountConfiguration ac;
+	private MailUtils mailUtils;
 	private JTree tree;
 	private JButton btnDelete;
 	private JButton btnReply;
@@ -37,6 +42,7 @@ public class MailContentViewerPanel extends JPanel {
 	
 	public MailContentViewerPanel(AccountConfiguration ac) {
 		this.ac = ac;
+		mailUtils = new MailUtils(ac);
 		initComponents();
 		setEvents();
 	}
@@ -177,8 +183,17 @@ public class MailContentViewerPanel extends JPanel {
 		scrollPaneFolderTree.setViewportView(panelFolderTree);
 		panelFolderTree.setLayout(new BorderLayout(0, 0));
 		
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode(ac.getEmail());
-		tree = new JTree(top);
+		//DefaultMutableTreeNode top = new DefaultMutableTreeNode(ac.getEmail());
+		//tree = new JTree(top);
+		tree = new JTree();
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+		new WorkerDialog(topFrame) {
+			@Override
+			protected Object doInBackground() {
+				tree.setModel(new FolderTreeModel(mailUtils.getFolder()));
+				return null;
+			}
+		}.execute();
 		tree.setRowHeight(25);
 		tree.setBackground(UIManager.getColor("Button.background"));
 		panelFolderTree.add(tree, BorderLayout.CENTER);
