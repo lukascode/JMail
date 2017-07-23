@@ -22,9 +22,18 @@ public class StringTree {
 			children = new ArrayList<Node>();
 		}
 		
-		public void addChild(String data) {
-			if(data != null)
-				children.add(new Node(data, this));
+		public Node addChild(String data) {
+			Node n = null;
+			if(data != null) {
+				n = new Node(data, this);
+				children.add(n);
+			}
+			return n;
+		}
+		
+		public String getPath() {
+			if(parent == null) return "";
+			return parent.getPath() + "/" + data;
 		}
 		
 		public String toString() {

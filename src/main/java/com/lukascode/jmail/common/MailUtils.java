@@ -2,10 +2,19 @@ package com.lukascode.jmail.common;
 
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import javax.mail.*;
+import javax.mail.Authenticator;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Store;
 
+import com.lukascode.jmail.common.StringTree.Node;
 import com.sun.mail.imap.IMAPFolder;
 
 public class MailUtils {
@@ -16,8 +25,8 @@ public class MailUtils {
 		this.ac = ac;
 	}
 	
-	public Folder getFolder() {
-		Folder folder = null;
+	public StringTree getFolders() {
+		StringTree stree = null;
 		try {
 			Session session = getIMAPSession();
 			Store store = null;
@@ -25,12 +34,41 @@ public class MailUtils {
 				store = session.getStore("imaps");
 			else store = session.getStore("imap");
 			store.connect(ac.getImapServerName(), ac.getEmail(), ac.getPassword());
-			folder = store.getFolder("");
+			Folder folder = store.getDefaultFolder();
+			stree = new StringTree(ac.getEmail());
+			buildFoldersTree(stree.root, folder);
 		} catch(Exception e) {
 			Main.logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
-		return folder;
+		return stree;
+	}
+	
+	public List<Message> getMessages(String folder) {
+		List<Message> messages = new ArrayList<>();
+		Session session = getIMAPSession();
+		Store store = null;
+		try {
+			if(ac.isImapServerSSL())
+				store = session.getStore("imaps");
+			else store = session.getStore("imap");
+			IMAPFolder _folder = (IMAPFolder) store.getFolder(folder);
+			_folder.open(Folder.READ_WRITE);
+			Message[] msgs = _folder.getMessages();
+			for(Message m: msgs) messages.add(m);
+		} catch(Exception e) {
+			Main.logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
+		return messages;
+	}
+	
+	private void buildFoldersTree(Node root, Folder folder) throws MessagingException {
+		Folder[] folders = folder.list();
+		for(Folder f: folders) {
+			Node node = root.addChild(f.getName());
+			buildFoldersTree(node, f);
+		}
 	}
 	
 	private Session getSMTPSession() {
@@ -64,6 +102,8 @@ public class MailUtils {
 			props.put("mail.store.protocol", "imaps");
 			props.put("mail.pop3.ssl.enable", "true");
 		} else props.put("mail.store.protocol", "imap");
+		if(ac.isImapServerTLS())
+			props.put("mail.imap.starttls.enable", "true");
 		session = Session.getInstance(props);
 		return session;
 	}

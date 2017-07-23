@@ -52,11 +52,18 @@ public class StartFrame extends JFrame {
 	private JButton buttonEdit;
 	
 	private AppFrame appFrame = null;
+	
+	public static StartFrame instance = null;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		create();
+	}
+	
+	public static void create() {
+		if(instance != null) return;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable e) {
@@ -65,8 +72,14 @@ public class StartFrame extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					StartFrame frame = new StartFrame();
-					frame.setVisible(true);
+					instance = new StartFrame();
+					instance.setVisible(true);
+					instance.addWindowListener(new WindowAdapter() {
+						@Override
+						public void windowClosed(WindowEvent ev) {
+							StartFrame.instance = null;
+						}
+					});
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -218,7 +218,7 @@ public class Main {
 		JMailDatabaseCreator.createInstance("jmail.db");
 		JMailDatabaseCreator.getInstance().createDatabase();
 		EventQueue.invokeLater(()->{
-			StartFrame.main(args);
+			StartFrame.create();
 		});
 		//new JMailDatabaseCreator("test.db");
 		//new MailHelper().receiveEmailIMAP("***REMOVED***", "pass");

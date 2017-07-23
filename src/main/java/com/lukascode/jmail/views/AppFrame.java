@@ -38,6 +38,7 @@ public class AppFrame extends JFrame {
 	private JTabbedPane tabbedPaneAccounts;
 	private JMenuItem mntmAbout;
 	private JMenuItem mntmFinish;
+	private JMenuItem mntmShowStartWindow;
 
 	/**
 	 * Launch the application.
@@ -78,7 +79,12 @@ public class AppFrame extends JFrame {
 		JMenu menuFile = new JMenu("File");
 		menuBar.add(menuFile);
 		
-		mntmFinish = new JMenuItem("Finish");
+		mntmShowStartWindow = new JMenuItem("Show start window");
+		
+		mntmShowStartWindow.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/route.png")));
+		menuFile.add(mntmShowStartWindow);
+		
+		mntmFinish = new JMenuItem("Exit");
 		
 		mntmFinish.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/exit.png")));
 		menuFile.add(mntmFinish);
@@ -108,6 +114,18 @@ public class AppFrame extends JFrame {
 	}
 	
 	public void setEvents() {
+		
+		mntmShowStartWindow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(StartFrame.instance != null) {
+					StartFrame.instance.toFront();
+					StartFrame.instance.repaint();
+				} else {
+					StartFrame.create();
+				}
+			}
+		});
+		
 		mntmAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AboutDialog.create().setLocationRelativeTo(AppFrame.this);

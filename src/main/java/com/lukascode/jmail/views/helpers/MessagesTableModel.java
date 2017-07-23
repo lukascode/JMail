@@ -1,5 +1,7 @@
 package com.lukascode.jmail.views.helpers;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,8 @@ public class MessagesTableModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		return messages.size();
+		//return messages.size();
+		return 20;
 	}
 
 	@Override
@@ -39,14 +42,20 @@ public class MessagesTableModel extends AbstractTableModel {
 		case 0: return "From";
 		case 1: return "To";
 		case 2: return "Subject";
-		case 4: return "Date";
+		case 3: return "Date";
 		}
 		return "";
 	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
+	//	Message message = messages.get(rowIndex);
+		switch(columnIndex) {
+			case 0: return "From";
+			case 1: return "To";
+			case 2: return "Subject";
+			case 3: return "Date";
+		}
 		return null;
 	}
 

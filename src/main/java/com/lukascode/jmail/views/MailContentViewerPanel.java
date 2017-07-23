@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -25,6 +26,7 @@ import javax.swing.UIManager;
 import com.lukascode.jmail.common.AccountConfiguration;
 import com.lukascode.jmail.common.MailUtils;
 import com.lukascode.jmail.views.helpers.FolderTreeModel;
+import com.lukascode.jmail.views.helpers.MessagesTableModel;
 import com.lukascode.jmail.views.helpers.WorkerDialog;
 
 public class MailContentViewerPanel extends JPanel {
@@ -39,6 +41,7 @@ public class MailContentViewerPanel extends JPanel {
 	private JButton btnDelete;
 	private JButton btnReply;
 	private JTextField textField;
+	private JTable tableMessages;
 	
 	public MailContentViewerPanel(AccountConfiguration ac) {
 		this.ac = ac;
@@ -96,9 +99,9 @@ public class MailContentViewerPanel extends JPanel {
 		JLabel lblNumber = new JLabel("Number of messages:");
 		
 		JLabel label = new JLabel("0");
-		label.setForeground(new Color(46, 139, 87));
+		label.setForeground(new Color(0, 0, 0));
 		label.setHorizontalAlignment(SwingConstants.LEFT);
-		label.setFont(new Font("Tahoma", Font.BOLD, 20));
+		label.setFont(new Font("Tahoma", Font.BOLD, 18));
 		
 		JButton btnNewMessage = new JButton("New message");
 		
@@ -106,29 +109,32 @@ public class MailContentViewerPanel extends JPanel {
 		textField.setColumns(10);
 		
 		JLabel lblFilter = new JLabel("Filter:");
+		
+		JButton btnLogout = new JButton("Logout");
 		GroupLayout gl_panelMenu = new GroupLayout(panelMenu);
 		gl_panelMenu.setHorizontalGroup(
 			gl_panelMenu.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelMenu.createSequentialGroup()
 					.addContainerGap()
+					.addComponent(lblNumber)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label, GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panelMenu.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panelMenu.createSequentialGroup()
-							.addGap(10)
-							.addComponent(label, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 231, Short.MAX_VALUE)
-							.addComponent(lblFilter)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 326, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panelMenu.createSequentialGroup()
-							.addComponent(lblNumber)
-							.addPreferredGap(ComponentPlacement.RELATED, 284, Short.MAX_VALUE)
 							.addComponent(btnNewMessage)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnShow)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnReply)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnDelete)))
+							.addComponent(btnDelete)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnLogout))
+						.addGroup(gl_panelMenu.createSequentialGroup()
+							.addComponent(lblFilter)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 418, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panelMenu.setVerticalGroup(
@@ -136,17 +142,18 @@ public class MailContentViewerPanel extends JPanel {
 				.addGroup(gl_panelMenu.createSequentialGroup()
 					.addGap(8)
 					.addGroup(gl_panelMenu.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNumber)
 						.addComponent(btnDelete)
 						.addComponent(btnReply)
 						.addComponent(btnShow)
-						.addComponent(btnNewMessage))
+						.addComponent(btnNewMessage)
+						.addComponent(btnLogout))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panelMenu.createParallelGroup(Alignment.LEADING)
-						.addComponent(label)
 						.addGroup(gl_panelMenu.createParallelGroup(Alignment.BASELINE)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblFilter)))
+							.addComponent(label)
+							.addComponent(lblFilter)
+							.addComponent(lblNumber))
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(21, Short.MAX_VALUE))
 		);
 		panelMenu.setLayout(gl_panelMenu);
@@ -154,32 +161,17 @@ public class MailContentViewerPanel extends JPanel {
 		JScrollPane scrollPaneMessages = new JScrollPane();
 		splitPane.setRightComponent(scrollPaneMessages);
 		
-		JPanel panelMessages = new JPanel();
-		scrollPaneMessages.setViewportView(panelMessages);
-		
-		JLabel lblMessages = new JLabel("Messages");
-		GroupLayout gl_panelMessages = new GroupLayout(panelMessages);
-		gl_panelMessages.setHorizontalGroup(
-			gl_panelMessages.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panelMessages.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblMessages)
-					.addContainerGap(762, Short.MAX_VALUE))
-		);
-		gl_panelMessages.setVerticalGroup(
-			gl_panelMessages.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panelMessages.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblMessages)
-					.addContainerGap(485, Short.MAX_VALUE))
-		);
-		panelMessages.setLayout(gl_panelMessages);
+		tableMessages = new JTable();
+		tableMessages.setModel(new MessagesTableModel());
+		scrollPaneMessages.setViewportView(tableMessages);
 		
 		JScrollPane scrollPaneFolderTree = new JScrollPane();
-		scrollPaneFolderTree.setMinimumSize(new Dimension(180, 10));
+		scrollPaneFolderTree.setBackground(Color.WHITE);
+		scrollPaneFolderTree.setMinimumSize(new Dimension(220, 10));
 		splitPaneFoldersContent.setLeftComponent(scrollPaneFolderTree);
 		
 		JPanel panelFolderTree = new JPanel();
+		panelFolderTree.setBackground(Color.WHITE);
 		scrollPaneFolderTree.setViewportView(panelFolderTree);
 		panelFolderTree.setLayout(new BorderLayout(0, 0));
 		
@@ -190,12 +182,12 @@ public class MailContentViewerPanel extends JPanel {
 		new WorkerDialog(topFrame) {
 			@Override
 			protected Object doInBackground() {
-				tree.setModel(new FolderTreeModel(mailUtils.getFolder()));
+				tree.setModel(new FolderTreeModel(mailUtils.getFolders()));
 				return null;
 			}
 		}.execute();
 		tree.setRowHeight(25);
-		tree.setBackground(UIManager.getColor("Button.background"));
+		tree.setBackground(Color.WHITE);
 		panelFolderTree.add(tree, BorderLayout.CENTER);
 		
 		JLabel lblFolders = new JLabel("Folders");

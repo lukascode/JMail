@@ -1,5 +1,7 @@
 package com.lukascode.jmail.views.helpers;
 
+import static org.mockito.Mockito.inOrder;
+
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.swing.event.TreeModelListener;
@@ -12,55 +14,36 @@ import com.lukascode.jmail.common.StringTree.Node;
 
 public class FolderTreeModel implements TreeModel {
 	
-	private Folder folder;
+	private StringTree tree;
 	
-	public FolderTreeModel(Folder folder) {
-		this.folder = folder;
+	public FolderTreeModel(StringTree tree) {
+		this.tree = tree;
 	}
 
 	@Override
 	public Object getRoot() {
-		return folder;
+		return tree.root;
 	}
 
 	@Override
 	public Object getChild(Object parent, int index) {
-		Folder child = null;
-		Folder _parent = (Folder) parent;
-		try {
-			Folder[] folders = _parent.list();
-			child = folders[index];
-		} catch (MessagingException e) {
-			Main.logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-		return child;
+		Node child = null;
+		Node _parent = (Node) parent;
+		return _parent.children.get(index);	
 	}
 
 	@Override
 	public int getChildCount(Object parent) {
-		int count = 0;
-		Folder _parent = (Folder) parent;
-		try {
-			count = _parent.list().length;
-		} catch (MessagingException e) {
-			Main.logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-		return count;
+		Node _parent = (Node)parent;
+		return _parent.children.size();
 	}
 
 	@Override
 	public boolean isLeaf(Object node) {
-		Folder _node = (Folder)node;
-		try {
-			if(_node.list().length == 0)
-				return true;
-		} catch (MessagingException e) {
-			Main.logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-		return false;
+		Node _node = (Node)node;
+		if(_node.children.size() > 0)
+			return false;
+		return true;
 	}
 
 	@Override
