@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -21,10 +23,14 @@ import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.lukascode.jmail.common.AccountConfiguration;
 import com.lukascode.jmail.common.MailUtils;
+import com.lukascode.jmail.common.StringTree;
+import com.lukascode.jmail.common.dao.EMessage;
 import com.lukascode.jmail.views.helpers.FolderTreeModel;
 import com.lukascode.jmail.views.helpers.MessagesTableModel;
 import com.lukascode.jmail.views.helpers.WorkerDialog;
@@ -43,7 +49,19 @@ public class MailContentViewerPanel extends JPanel {
 	private JTextField textField;
 	private JTable tableMessages;
 	
+	private HashMap<String, List<EMessage>> messagesSets;
+	
+	private List<EMessage> getMessagesSmart(String folder) {
+		if(messagesSets.containsKey(folder)) {
+			return messagesSets.get(folder);
+		}
+		List<EMessage> msgs = mailUtils.getMessages(folder);
+		messagesSets.put(folder, msgs);
+		return msgs;
+	}
+	
 	public MailContentViewerPanel(AccountConfiguration ac) {
+		messagesSets = new HashMap<>();
 		this.ac = ac;
 		mailUtils = new MailUtils(ac);
 		initComponents();
@@ -159,10 +177,14 @@ public class MailContentViewerPanel extends JPanel {
 		panelMenu.setLayout(gl_panelMenu);
 		
 		JScrollPane scrollPaneMessages = new JScrollPane();
+		scrollPaneMessages.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		splitPane.setRightComponent(scrollPaneMessages);
 		
 		tableMessages = new JTable();
-		tableMessages.setModel(new MessagesTableModel());
+		tableMessages.setShowVerticalLines(false);
+		tableMessages.setRowHeight(40);
+		tableMessages.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 18));
+		tableMessages.getTableHeader().setBackground(new Color(66, 244, 200));
 		scrollPaneMessages.setViewportView(tableMessages);
 		
 		JScrollPane scrollPaneFolderTree = new JScrollPane();
@@ -175,17 +197,19 @@ public class MailContentViewerPanel extends JPanel {
 		scrollPaneFolderTree.setViewportView(panelFolderTree);
 		panelFolderTree.setLayout(new BorderLayout(0, 0));
 		
-		//DefaultMutableTreeNode top = new DefaultMutableTreeNode(ac.getEmail());
-		//tree = new JTree(top);
 		tree = new JTree();
+		//Processing
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		new WorkerDialog(topFrame) {
 			@Override
 			protected Object doInBackground() {
 				tree.setModel(new FolderTreeModel(mailUtils.getFolders()));
+				System.out.println("Now set model for tables");
+				tableMessages.setModel(new MessagesTableModel(getMessagesSmart("INBOX")));
 				return null;
 			}
 		}.execute();
+		//----------------
 		tree.setRowHeight(25);
 		tree.setBackground(Color.WHITE);
 		panelFolderTree.add(tree, BorderLayout.CENTER);
@@ -196,6 +220,23 @@ public class MailContentViewerPanel extends JPanel {
 	}
 	
 	public void setEvents() {
-		
+		tree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				StringTree.Node node = (StringTree.Node)
+                        tree.getLastSelectedPathComponent();
+				if(node.children.size() > 0) return;
+				if(node == null) return;
+				String path = node.getPath().substring(1);
+				JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(MailContentViewerPanel.this);
+				new WorkerDialog(topFrame) {
+					@Override
+					protected Object doInBackground() {
+						tableMessages.setModel(new MessagesTableModel(getMessagesSmart(path)));
+						return null;
+					}
+				}.execute();
+			}
+		});
 	}
 }

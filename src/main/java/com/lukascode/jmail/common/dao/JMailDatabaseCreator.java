@@ -29,7 +29,7 @@ public class JMailDatabaseCreator {
 	
 	public boolean createDatabase() {
 		boolean result = false;
-		String url = "jdbc:sqlite:" + fileName;
+		String url = "jdbc:sqlite:" + Main.APP_FOLDER + "\\" + fileName;
 		String sql = getSQLCreator();
 		try (Connection conn = connect();
 				Statement stmt = conn.createStatement()) {
@@ -38,12 +38,11 @@ public class JMailDatabaseCreator {
 	    } catch (SQLException e) {
 	    	Main.logger.severe("Database creation error. " + e.getMessage());
 	    }
-		Main.logger.log(Level.INFO, "Database '" + fileName + "' created");
 		return result;
 	}
 	
 	public Connection connect() {
-		String url = "jdbc:sqlite:" + fileName;
+		String url = "jdbc:sqlite:" + Main.APP_FOLDER + "\\" + fileName;
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url);

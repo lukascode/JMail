@@ -3,32 +3,38 @@ package com.lukascode.jmail.views.helpers;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.swing.table.AbstractTableModel;
+
+import com.lukascode.jmail.common.Main;
+import com.lukascode.jmail.common.dao.EMessage;
 
 public class MessagesTableModel extends AbstractTableModel {
 	
-	private List<Message> messages;
+	private List<EMessage> messages;
 	
-	public MessagesTableModel(List<Message> messages) {
+	public MessagesTableModel(List<EMessage> messages) {
 		this.messages = messages;
 	}
 	
 	public MessagesTableModel() {
-		messages = new ArrayList<Message>();
+		messages = new ArrayList<EMessage>();
 	}
 	
-	public void addRow(Message m) {
+	public void addRow(EMessage m) {
 		messages.add(m);
 		fireTableRowsInserted(messages.size()-1, messages.size()-1);
 	}
 
 	@Override
 	public int getRowCount() {
-		//return messages.size();
-		return 20;
+		return messages.size();
 	}
 
 	@Override
@@ -49,12 +55,19 @@ public class MessagesTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-	//	Message message = messages.get(rowIndex);
+		EMessage message = messages.get(rowIndex);
 		switch(columnIndex) {
-			case 0: return "From";
-			case 1: return "To";
-			case 2: return "Subject";
-			case 3: return "Date";
+			case 0: 
+				return message.getFrom();
+			
+			case 1: 
+				return message.getTo();
+			
+			case 2: 
+				return message.getSubject();
+			
+			case 3: 
+				return message.getDate().toString();
 		}
 		return null;
 	}

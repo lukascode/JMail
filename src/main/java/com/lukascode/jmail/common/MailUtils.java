@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -13,8 +14,10 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.InternetAddress;
 
 import com.lukascode.jmail.common.StringTree.Node;
+import com.lukascode.jmail.common.dao.EMessage;
 import com.sun.mail.imap.IMAPFolder;
 
 public class MailUtils {
@@ -44,23 +47,52 @@ public class MailUtils {
 		return stree;
 	}
 	
-	public List<Message> getMessages(String folder) {
-		List<Message> messages = new ArrayList<>();
+	public List<EMessage> getMessages(String folder) {
+		List<EMessage> messages = new ArrayList<>();
 		Session session = getIMAPSession();
 		Store store = null;
+		IMAPFolder _folder = null;
 		try {
 			if(ac.isImapServerSSL())
 				store = session.getStore("imaps");
 			else store = session.getStore("imap");
-			IMAPFolder _folder = (IMAPFolder) store.getFolder(folder);
+			store.connect(ac.getImapServerName(), ac.getEmail(), ac.getPassword());
+			 _folder = (IMAPFolder) store.getFolder(folder);
 			_folder.open(Folder.READ_WRITE);
 			Message[] msgs = _folder.getMessages();
-			for(Message m: msgs) messages.add(m);
+			for(Message m: msgs) messages.add(createEMessage(m));
+		} catch(Exception e) {
+			Main.logger.severe(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if(_folder != null) _folder.close(false);
+				if(store != null) store.close();
+			} catch(Exception e) {
+				Main.logger.severe(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		return messages;
+	}
+	
+	private EMessage createEMessage(Message m) {
+		EMessage result = new EMessage();
+		try {
+			result.setSubject(m.getSubject());
+			result.setDate(m.getReceivedDate());
+			Address[] addrs = null;
+			addrs = m.getAllRecipients();
+			String email = addrs == null ? null : ((InternetAddress) addrs[0]).getAddress();
+			result.setTo(email);
+			addrs = m.getFrom();
+			email = addrs == null ? null : ((InternetAddress) addrs[0]).getAddress();
+			result.setFrom(email);
 		} catch(Exception e) {
 			Main.logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
-		return messages;
+		return result;
 	}
 	
 	private void buildFoldersTree(Node root, Folder folder) throws MessagingException {

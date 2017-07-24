@@ -1,5 +1,6 @@
 package com.lukascode.jmail.common;
 import java.awt.EventQueue;
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
@@ -12,7 +13,6 @@ import java.util.logging.SimpleFormatter;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.Transport;
@@ -23,7 +23,6 @@ import javax.swing.JFrame;
 import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.MessageViewer;
 import com.lukascode.jmail.views.StartFrame;
-import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.pop3.POP3Store;
 
 class MailHelper {
@@ -145,13 +144,13 @@ class MailHelper {
 			
 			Store store = emailSession.getStore("imaps");
 			store.connect("imap.gmail.com", user, password);
-			IMAPFolder folder = (IMAPFolder) store.getFolder("[Gmail]");
-			Folder[] folders = folder.list();
-			for(int i=0; i<folders.length; ++i) {
-				System.out.println(folders[i].getName());
-			}
-			
-			if(true) return;
+			Folder folder = store.getFolder("INBOX");
+//			Folder[] folders = folder.list();
+//			for(int i=0; i<folders.length; ++i) {
+//				System.out.println(folders[i].getName());
+//			}
+//			
+//			if(true) return;
 			
 			folder.open(Folder.READ_ONLY);
 			Message[] messages = folder.getMessages();
@@ -186,7 +185,18 @@ public class Main {
 	
 	public static Logger logger;
 	
+	public final static String APP_FOLDER = System.getProperty("user.home")+ "\\.jmail";
+	
 	static {
+		//Create app folder in home directory
+		File dir = new File(APP_FOLDER);
+		if(!dir.exists()) {
+			try {
+				dir.mkdir();
+			} catch(SecurityException e) {
+				e.printStackTrace();
+			}
+		}
 		System.setProperty("java.util.logging.SimpleFormatter.format", 
 				"%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$-6s %2$s %5$s%6$s%n");
 		logger = Logger.getLogger("com.lukascode.jmail");
@@ -194,7 +204,7 @@ public class Main {
 		logger.setUseParentHandlers(false);
 		Handler handler = null;
 		try {
-			handler = new FileHandler("%h/jmail.log", true);
+			handler = new FileHandler("%h/.jmail/jmail.log", true);
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -215,6 +225,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
+	
 		JMailDatabaseCreator.createInstance("jmail.db");
 		JMailDatabaseCreator.getInstance().createDatabase();
 		EventQueue.invokeLater(()->{
