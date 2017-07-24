@@ -126,6 +126,7 @@ public class StartFrame extends JFrame {
 		menuItemAbout.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/about.png")));
 		menuHelp.add(menuItemAbout);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
@@ -137,6 +138,7 @@ public class StartFrame extends JFrame {
 		accountActionLabel.setForeground(new Color(0, 51, 204));
 		
 		JScrollPane accountsScrollPane = new JScrollPane();
+		accountsScrollPane.setBackground(Color.WHITE);
 		
 		buttonRemove = new JButton("Remove");
 		
@@ -191,7 +193,9 @@ public class StartFrame extends JFrame {
 		);
 		
 		accountsTable = new JTable();
+		accountsTable.setFillsViewportHeight(true);
 		accountsTable.setBackground(Color.WHITE);
+		accountsTable.setSelectionBackground(new Color(50, 228, 181));
 		accountsTable.setRowHeight(22);
 		accountsTable.setShowHorizontalLines(false);
 		accountsTable.setShowVerticalLines(false);
