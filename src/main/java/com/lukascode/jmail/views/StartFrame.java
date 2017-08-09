@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Level;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -19,15 +20,19 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 
 import com.lukascode.jmail.common.AccountConfiguration;
+import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
@@ -81,7 +86,8 @@ public class StartFrame extends JFrame {
 						}
 					});
 				} catch (Exception e) {
-					e.printStackTrace();
+					Main.logger.log(Level.SEVERE, e.getMessage());
+					throw e;
 				}
 			}
 		});
@@ -235,6 +241,12 @@ public class StartFrame extends JFrame {
 					TableModel model = accountsTable.getModel();
 					AccountsTableModel m = (AccountsTableModel)model;
 					AccountConfiguration ac = m.getRow(selected);
+					if(!ac.isSavePassword()) {
+					      GetPassDialog dialog = GetPassDialog.create();
+					      if(dialog.OK_CLICKED) {
+					    	  ac.setPassword(dialog.getPassword());
+					      }
+					}
 					if(appFrame == null) {
 						appFrame = AppFrame.create();
 						appFrame.addWindowListener(new WindowAdapter() {

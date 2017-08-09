@@ -132,7 +132,9 @@ public class MailUtils {
 		Properties props = new Properties();
 		if(ac.isImapServerSSL()) {
 			props.put("mail.store.protocol", "imaps");
-			props.put("mail.pop3.ssl.enable", "true");
+			props.put("mail.imap.ssl.enable", "true");
+			//props.put("mail.imaps.ssl.trust", ac.getSmtpServerName()); 
+			props.put("mail.imaps.ssl.trust", "*"); 
 		} else props.put("mail.store.protocol", "imap");
 		if(ac.isImapServerTLS())
 			props.put("mail.imap.starttls.enable", "true");

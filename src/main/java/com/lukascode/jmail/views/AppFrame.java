@@ -21,6 +21,8 @@ import java.awt.GridBagLayout;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
+import com.lukascode.jmail.common.Main;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTabbedPane;
@@ -30,6 +32,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import java.awt.event.ActionEvent;
 
 public class AppFrame extends JFrame {
@@ -51,8 +54,9 @@ public class AppFrame extends JFrame {
 		AppFrame frame = null;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Throwable e) {
-			e.printStackTrace();
+		} catch(Throwable e) {
+			Main.logger.log(Level.SEVERE, e.getMessage());
+			System.exit(ERROR);
 		}
 		frame = new AppFrame();
 		frame.setVisible(true);

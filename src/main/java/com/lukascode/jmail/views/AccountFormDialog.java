@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.lukascode.jmail.common.AccountConfiguration;
+import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
 
@@ -70,7 +72,8 @@ public class AccountFormDialog extends JDialog {
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Main.logger.log(Level.SEVERE, e.getMessage());
+			throw e;
 		}
 		return dialog;
 	}

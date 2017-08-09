@@ -224,35 +224,15 @@ public class Main {
 	
 
 	public static void main(String[] args) {
-		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
+//		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
+//	
+//		JMailDatabaseCreator.createInstance("jmail.db");
+//		JMailDatabaseCreator.getInstance().createDatabase();
+//		EventQueue.invokeLater(()->{
+//			StartFrame.create();
+//		});
+		
 	
-		JMailDatabaseCreator.createInstance("jmail.db");
-		JMailDatabaseCreator.getInstance().createDatabase();
-		EventQueue.invokeLater(()->{
-			StartFrame.create();
-		});
-		//new JMailDatabaseCreator("test.db");
-		//new MailHelper().receiveEmailIMAP("***REMOVED***", "pass");
-//		AccountConfiguration ac = new AccountConfiguration();
-//		AccountConfigurationDAO acdao = new AccountConfigurationDAO();
-//		ac.setId(0);
-//		ac.setEmail("alamakota@gmail.com");
-//		ac.setPassword("password");
-//		ac.setSavePassword(true);
-//		ac.setSmtpServerName("smtp.gmail.com");
-//		ac.setSmtpServerPort("465");
-//		ac.setSmtpServerSSL(true);
-//		ac.setImapServerTLS(false);
-//		ac.setImapServerName("imap.gmail.com");
-//		ac.setImapServerPort("993");
-//		ac.setImapServerSSL(true);
-//		ac.setImapServerTLS(false);
-//		ac.setLastLogin(LocalDateTime.now());
-//		if(acdao.insert(ac))
-//			logger.log(Level.INFO, "inserted");
-			
-		//MailHelper mh = new MailHelper();
-		//mh.receiveEmailIMAP("***REMOVED***", "***REMOVED***");
 
 			
 	}
