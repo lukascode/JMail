@@ -8,12 +8,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -25,10 +27,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.lukascode.jmail.common.AccountConfiguration;
+import com.lukascode.jmail.common.JMailException;
 import com.lukascode.jmail.common.MailUtils;
+import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.StringTree;
 import com.lukascode.jmail.common.dao.EMessage;
 import com.lukascode.jmail.views.helpers.FolderTreeModel;
@@ -200,11 +203,10 @@ public class MailContentViewerPanel extends JPanel {
 		tree = new JTree();
 		//Processing
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-		new WorkerDialog(topFrame) {
+		new WorkerDialog(topFrame, "Collecting information") {
 			@Override
 			protected Object doInBackground() {
 				tree.setModel(new FolderTreeModel(mailUtils.getFolders()));
-				System.out.println("Now set model for tables");
 				tableMessages.setModel(new MessagesTableModel(getMessagesSmart("INBOX")));
 				return null;
 			}
@@ -229,10 +231,18 @@ public class MailContentViewerPanel extends JPanel {
 				if(node == null) return;
 				String path = node.getPath().substring(1);
 				JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(MailContentViewerPanel.this);
-				new WorkerDialog(topFrame) {
+				new WorkerDialog(topFrame, "Collecting information") {
 					@Override
 					protected Object doInBackground() {
-						tableMessages.setModel(new MessagesTableModel(getMessagesSmart(path)));
+						try {
+							tableMessages.setModel(new MessagesTableModel(getMessagesSmart(path)));
+						} catch(JMailException e) {
+							Main.logger.log(Level.SEVERE, e.getMessage());
+							JOptionPane.showMessageDialog(topFrame,
+								    e.getMessage(),
+								    "JMailError",
+								    JOptionPane.ERROR_MESSAGE);
+						}
 						return null;
 					}
 				}.execute();

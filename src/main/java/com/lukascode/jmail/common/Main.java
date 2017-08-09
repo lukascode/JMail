@@ -19,6 +19,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.MessageViewer;
@@ -224,17 +225,14 @@ public class Main {
 	
 
 	public static void main(String[] args) {
-//		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
-//	
-//		JMailDatabaseCreator.createInstance("jmail.db");
-//		JMailDatabaseCreator.getInstance().createDatabase();
-//		EventQueue.invokeLater(()->{
-//			StartFrame.create();
-//		});
-		
+		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
 	
-
-			
+		JMailDatabaseCreator.createInstance("jmail.db");
+		JMailDatabaseCreator.getInstance().createDatabase();
+		EventQueue.invokeLater(()->{
+			StartFrame.create();
+		});	
 	}
 
 }
+

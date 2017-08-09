@@ -1,6 +1,7 @@
 package com.lukascode.jmail.views.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -14,8 +15,18 @@ public class AccountsTableModel extends AbstractTableModel {
 	
 	private List<AccountConfiguration> accounts;
 	
+	public void sort() {
+		accounts.sort(new Comparator<AccountConfiguration>() {
+			@Override
+			public int compare(AccountConfiguration o1, AccountConfiguration o2) {
+				return o2.getLastLogin().compareTo(o1.getLastLogin());
+			}
+		});
+	}
+	
 	public AccountsTableModel(List<AccountConfiguration> accounts) {
 		this.accounts = accounts;
+		sort();
 	}
 	
 	public AccountsTableModel() {
@@ -60,6 +71,11 @@ public class AccountsTableModel extends AbstractTableModel {
 			accounts.set(idx, ac);
 			fireTableRowsUpdated(idx, idx);
 		}
+	}
+	
+	public void refresh() {
+		fireTableDataChanged();
+		sort();
 	}
 	
 	public void removeRow(int row) {

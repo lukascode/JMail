@@ -5,6 +5,7 @@ package com.lukascode.jmail.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.mail.Address;
 import javax.mail.Authenticator;
@@ -28,11 +29,33 @@ public class MailUtils {
 		this.ac = ac;
 	}
 	
+	public boolean credentialsCorrect() {
+		boolean result = true;
+		Session session = getIMAPSession();
+		Store store = null;
+		try {
+			if(ac.isImapServerSSL())
+				store = session.getStore("imaps");
+			else store = session.getStore("imap");
+			store.connect(ac.getImapServerName(), ac.getEmail(), ac.getPassword());
+		} catch(MessagingException e) {
+			result = false;
+		} finally {
+			if(store != null)
+				try {
+					store.close();
+				} catch (MessagingException e) {
+					Main.logger.log(Level.SEVERE, "exception was thrown", e);
+				}
+		}
+		return result;
+	}
+	
 	public StringTree getFolders() {
 		StringTree stree = null;
+		Store store = null;
 		try {
 			Session session = getIMAPSession();
-			Store store = null;
 			if(ac.isImapServerSSL())
 				store = session.getStore("imaps");
 			else store = session.getStore("imap");
@@ -41,8 +64,16 @@ public class MailUtils {
 			stree = new StringTree(ac.getEmail());
 			buildFoldersTree(stree.root, folder);
 		} catch(Exception e) {
-			Main.logger.severe(e.getMessage());
+			Main.logger.log(Level.SEVERE, "exception was thrown", e);
 			e.printStackTrace();
+			throw new JMailException("Error while collecting data from server (folder tree)\n" + e.getMessage());
+		} finally {
+			if(store != null)
+				try {
+					store.close();
+				} catch (MessagingException e) {
+					Main.logger.log(Level.SEVERE, "exception was thrown", e);
+				}
 		}
 		return stree;
 	}
@@ -62,15 +93,14 @@ public class MailUtils {
 			Message[] msgs = _folder.getMessages();
 			for(Message m: msgs) messages.add(createEMessage(m));
 		} catch(Exception e) {
-			Main.logger.severe(e.getMessage());
-			e.printStackTrace();
+			Main.logger.log(Level.SEVERE, "exception was thrown", e);
+			throw new JMailException("Can not retrieve messages from server\n" + e.getMessage());
 		} finally {
 			try {
-				if(_folder != null) _folder.close(false);
+				if(_folder != null && _folder.isOpen()) _folder.close(false);
 				if(store != null) store.close();
 			} catch(Exception e) {
-				Main.logger.severe(e.getMessage());
-				e.printStackTrace();
+				Main.logger.log(Level.SEVERE, "exception was thrown", e);
 			}
 		}
 		return messages;
@@ -89,8 +119,7 @@ public class MailUtils {
 			email = addrs == null ? null : ((InternetAddress) addrs[0]).getAddress();
 			result.setFrom(email);
 		} catch(Exception e) {
-			Main.logger.severe(e.getMessage());
-			e.printStackTrace();
+			Main.logger.log(Level.SEVERE, "exception was thrown", e);
 		}
 		return result;
 	}
