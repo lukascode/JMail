@@ -2,6 +2,7 @@ package com.lukascode.jmail.views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -26,8 +27,6 @@ import javax.swing.border.EmptyBorder;
 
 import com.lukascode.jmail.common.AccountConfiguration;
 import com.lukascode.jmail.common.Main;
-import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
-import com.lukascode.jmail.views.helpers.AccountsTableModel;
 
 public class AccountFormDialog extends JDialog {
 
@@ -56,10 +55,10 @@ public class AccountFormDialog extends JDialog {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		create(null);
+		create(null, null);
 	}
 	
-	public static AccountFormDialog create(AccountConfiguration ac) {
+	public static AccountFormDialog create(AccountConfiguration ac, Component owner) {
 		AccountFormDialog dialog = null;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -70,6 +69,7 @@ public class AccountFormDialog extends JDialog {
 			dialog = new AccountFormDialog();
 			dialog.fillForm(ac);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setLocationRelativeTo(owner);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			Main.logger.log(Level.SEVERE, e.getMessage());

@@ -226,7 +226,6 @@ public class Main {
 
 	public static void main(String[] args) {
 		logger.log(Level.INFO, "NEW APPLICATION LAUNCH");
-	
 		JMailDatabaseCreator.createInstance("jmail.db");
 		JMailDatabaseCreator.getInstance().createDatabase();
 		EventQueue.invokeLater(()->{

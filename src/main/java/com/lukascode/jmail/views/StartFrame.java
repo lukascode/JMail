@@ -108,6 +108,7 @@ public class StartFrame extends JFrame {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
 				JOptionPane.showMessageDialog(StartFrame.this, e.getMessage(), "JMail Error", JOptionPane.ERROR_MESSAGE);
+				Main.logger.log(Level.SEVERE, "JMail Error", e);
 			}
 		});
 		
@@ -256,13 +257,23 @@ public class StartFrame extends JFrame {
 					AccountsTableModel m = (AccountsTableModel)model;
 					AccountConfiguration ac = m.getRow(selected);
 					if(!ac.isSavePassword()) {
-					      GetPassDialog dialog = GetPassDialog.create();
+					      GetPassDialog dialog = GetPassDialog.create(StartFrame.this);
 					      if(dialog.OK_CLICKED) {
 					    	  ac.setPassword(dialog.getPassword());
-					      }
+					      } else return;
 					}
 					
-					if(new MailUtils(ac).credentialsCorrect()) {
+					//check credentials
+					WorkerDialog wd = new WorkerDialog(StartFrame.this, "Authorization...") {
+						@Override
+						protected Object doInBackground() {
+							return new MailUtils(ac).credentialsCorrect();
+						}
+					};
+					wd.execute();
+					boolean result = (boolean) wd.getValue();
+					
+					if(result) {
 						if(appFrame == null) {
 							appFrame = AppFrame.create();
 							appFrame.addWindowListener(new WindowAdapter() {
@@ -305,8 +316,7 @@ public class StartFrame extends JFrame {
 				new SimpleLinkLabel(labelConfigureNewAccount, Color.DARK_GRAY, new Color(64, 144, 237)) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				AccountFormDialog ad = AccountFormDialog.create(null);
-				ad.setLocationRelativeTo(StartFrame.this);
+				AccountFormDialog ad = AccountFormDialog.create(null, StartFrame.this);
 				AccountConfiguration ac = ad.getResult();
 				if(ac != null) {
 					TableModel model = accountsTable.getModel();
@@ -323,8 +333,7 @@ public class StartFrame extends JFrame {
 					TableModel model = accountsTable.getModel();
 					AccountsTableModel m = (AccountsTableModel)model;
 					AccountConfiguration ac = m.getRow(selected);
-					AccountFormDialog ad = AccountFormDialog.create(ac);
-					ad.setLocationRelativeTo(StartFrame.this);
+					AccountFormDialog ad = AccountFormDialog.create(ac, StartFrame.this);
 					AccountConfiguration acUpdated = ad.getResult();
 					if(acUpdated != null) {
 						acUpdated.setId(ac.getId());

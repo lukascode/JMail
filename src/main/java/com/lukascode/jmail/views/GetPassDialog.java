@@ -1,19 +1,23 @@
 package com.lukascode.jmail.views;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Level;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.border.EmptyBorder;
+
+import com.lukascode.jmail.common.Main;
 
 public class GetPassDialog extends JDialog {
 
@@ -26,17 +30,18 @@ public class GetPassDialog extends JDialog {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		GetPassDialog.create();
+		GetPassDialog.create(null);
 	}
 	
-	public static GetPassDialog create() {
+	public static GetPassDialog create(Component owner) {
 		GetPassDialog dialog = null;
 		try {
 			dialog = new GetPassDialog();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setLocationRelativeTo(owner);
 			dialog.setVisible(true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Main.logger.log(Level.SEVERE, "PasswordDialog creation failed", e);
 		}
 		return dialog;
 	}
