@@ -37,9 +37,15 @@ import com.lukascode.jmail.common.dao.EMessage;
 import com.lukascode.jmail.views.helpers.FolderTreeModel;
 import com.lukascode.jmail.views.helpers.MessagesTableModel;
 import com.lukascode.jmail.views.helpers.WorkerDialog;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MailContentViewerPanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * Create the panel.
 	 */
@@ -51,8 +57,10 @@ public class MailContentViewerPanel extends JPanel {
 	private JButton btnReply;
 	private JTextField textField;
 	private JTable tableMessages;
+	private AppFrame appFrame;
 	
 	private HashMap<String, List<EMessage>> messagesSets;
+	private JButton btnLogout;
 	
 	private List<EMessage> getMessagesSmart(String folder) {
 		if(messagesSets.containsKey(folder)) {
@@ -63,7 +71,8 @@ public class MailContentViewerPanel extends JPanel {
 		return msgs;
 	}
 	
-	public MailContentViewerPanel(AccountConfiguration ac) {
+	public MailContentViewerPanel(AccountConfiguration ac, AppFrame appFrame) {
+		this.appFrame = appFrame;
 		messagesSets = new HashMap<>();
 		this.ac = ac;
 		mailUtils = new MailUtils(ac);
@@ -131,7 +140,7 @@ public class MailContentViewerPanel extends JPanel {
 		
 		JLabel lblFilter = new JLabel("Filter:");
 		
-		JButton btnLogout = new JButton("Logout");
+		btnLogout = new JButton("Logout");
 		GroupLayout gl_panelMenu = new GroupLayout(panelMenu);
 		gl_panelMenu.setHorizontalGroup(
 			gl_panelMenu.createParallelGroup(Alignment.LEADING)
@@ -222,13 +231,20 @@ public class MailContentViewerPanel extends JPanel {
 	}
 	
 	public void setEvents() {
+		
+		btnLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				appFrame.removeTab(MailContentViewerPanel.this);
+			}
+		});
+		
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
 				StringTree.Node node = (StringTree.Node)
                         tree.getLastSelectedPathComponent();
-				if(node.children.size() > 0) return;
 				if(node == null) return;
+				if(node.children.size() > 0) return;
 				String path = node.getPath().substring(1);
 				JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(MailContentViewerPanel.this);
 				new WorkerDialog(topFrame, "Collecting information") {

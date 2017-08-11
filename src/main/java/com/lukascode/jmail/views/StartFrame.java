@@ -2,15 +2,17 @@ package com.lukascode.jmail.views;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -23,11 +25,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -39,14 +38,18 @@ import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.helpers.AccountsTableModel;
-import com.lukascode.jmail.views.helpers.FolderTreeModel;
-import com.lukascode.jmail.views.helpers.MessagesTableModel;
+import com.lukascode.jmail.views.helpers.Resources;
 import com.lukascode.jmail.views.helpers.SimpleLinkLabel;
 import com.lukascode.jmail.views.helpers.WorkerDialog;
 
 
 public class StartFrame extends JFrame {
 
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JLabel labelConfigureNewAccount;
 	private JLabel accountActionLabel;
@@ -107,8 +110,20 @@ public class StartFrame extends JFrame {
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
-				JOptionPane.showMessageDialog(StartFrame.this, e.getMessage(), "JMail Error", JOptionPane.ERROR_MESSAGE);
 				Main.logger.log(Level.SEVERE, "JMail Error", e);
+				if(e.getMessage() != null) {
+					JOptionPane.showMessageDialog(StartFrame.this, "[" + e.getClass().getSimpleName() + "] " + e.getMessage(), "JMail Error", JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+					JOptionPane.showMessageDialog(StartFrame.this, e.toString(), "JMail Error", JOptionPane.ERROR_MESSAGE);
+				}
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e1) {
+					Main.logger.log(Level.SEVERE, "Thread.sleep error", e1);
+				} finally {
+					System.exit(ERROR);
+				}
 			}
 		});
 		
@@ -116,9 +131,9 @@ public class StartFrame extends JFrame {
 		setEvents();
 	}
 	
-	private void initComponents() {
+	private void initComponents() {	
 		setResizable(false);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(StartFrame.class.getResource("/icons/email.png")));
+		setIconImage(Resources.getImage("/icons/email.png"));
 		setTitle(" JMail Client");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 850, 542);
@@ -131,12 +146,12 @@ public class StartFrame extends JFrame {
 		
 		menuItemImportSettings = new JMenuItem("Import Settings");
 		
-		menuItemImportSettings.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/import.png")));
+		menuItemImportSettings.setIcon(Resources.getIcon("/icons/import.png"));
 		menuFile.add(menuItemImportSettings);
 		
 		menuItemExit = new JMenuItem("Exit");
-		menuItemExit.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/exit.png")));
-		
+		menuItemExit.setIcon(Resources.getIcon("/icons/exit.png"));
+
 		menuFile.add(menuItemExit);
 		
 		menuHelp = new JMenu("Help");
@@ -144,7 +159,7 @@ public class StartFrame extends JFrame {
 		
 		menuItemAbout = new JMenuItem("About");
 		
-		menuItemAbout.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/about.png")));
+		menuItemAbout.setIcon(Resources.getIcon("/icons/about.png"));
 		menuHelp.add(menuItemAbout);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
@@ -168,8 +183,7 @@ public class StartFrame extends JFrame {
 		buttonEdit = new JButton("Edit");
 		
 		labelEmailLogo = new JLabel("");
-		labelEmailLogo.setIcon(new ImageIcon(StartFrame.class.getResource("/icons/email_logo2.png")));
-		
+		labelEmailLogo.setIcon(Resources.getIcon("/icons/email_logo2.png"));
 		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
@@ -286,7 +300,7 @@ public class StartFrame extends JFrame {
 						ac.setLastLogin(LocalDateTime.now());
 						new AccountConfigurationDAO().update(ac);
 						m.refresh();
-						appFrame.addTab(new MailContentViewerPanel(ac), ac.getEmail());
+						appFrame.addTab(new MailContentViewerPanel(ac, appFrame), ac.getEmail());
 					} else {
 						JOptionPane.showMessageDialog(StartFrame.this, "Logon attempt failed", 
 								"Authorization failed", JOptionPane.ERROR_MESSAGE);

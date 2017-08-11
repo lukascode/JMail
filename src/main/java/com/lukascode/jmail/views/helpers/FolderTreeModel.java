@@ -1,14 +1,11 @@
 package com.lukascode.jmail.views.helpers;
 
-import static org.mockito.Mockito.inOrder;
 
-import javax.mail.Folder;
-import javax.mail.MessagingException;
+
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.StringTree;
 import com.lukascode.jmail.common.StringTree.Node;
 

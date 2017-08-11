@@ -1,22 +1,18 @@
 package com.lukascode.jmail.views.helpers;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.swing.table.AbstractTableModel;
 
-import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.dao.EMessage;
 
 public class MessagesTableModel extends AbstractTableModel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private List<EMessage> messages;
 	
 	public MessagesTableModel(List<EMessage> messages) {

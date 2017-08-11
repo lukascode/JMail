@@ -6,7 +6,6 @@ import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.net.URI;
 
 import javax.swing.GroupLayout;
@@ -16,13 +15,18 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import com.lukascode.jmail.views.helpers.Resources;
 import com.lukascode.jmail.views.helpers.SimpleLinkLabel;
-import javax.swing.UIManager;
 
 public class AboutDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JLabel labelGithubLink;
 
@@ -56,7 +60,7 @@ public class AboutDialog extends JDialog {
 	public AboutDialog() {
 		setTitle("About");
 		setResizable(false);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AboutDialog.class.getResource("/icons/email.png")));
+		setIconImage(Resources.getImage("/icons/email.png"));
 		setBounds(100, 100, 450, 217);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -85,7 +89,7 @@ public class AboutDialog extends JDialog {
 		JLabel lblDate = new JLabel("Date: 07.2017");
 		
 		JLabel label = new JLabel("");
-		label.setIcon(new ImageIcon(AboutDialog.class.getResource("/icons/github-logo.png")));
+		label.setIcon(Resources.getIcon("/icons/github-logo.png"));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)

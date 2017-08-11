@@ -44,7 +44,11 @@ import javax.swing.JPanel;
 
 public class MessageViewer extends JPanel implements CommandObject {
     
-    Message	displayed = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	Message	displayed = null;
     DataHandler	dataHandler = null;
     String	verb = null;
     Component	mainbody;

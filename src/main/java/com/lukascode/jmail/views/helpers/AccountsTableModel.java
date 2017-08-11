@@ -11,6 +11,11 @@ import com.lukascode.jmail.common.dao.AccountConfigurationDAO;
 
 public class AccountsTableModel extends AbstractTableModel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static AccountConfigurationDAO acdao = new AccountConfigurationDAO();
 	
 	private List<AccountConfiguration> accounts;

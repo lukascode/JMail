@@ -1,42 +1,32 @@
 package com.lukascode.jmail.views;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import java.awt.Toolkit;
-import javax.swing.JLabel;
-import javax.swing.JRadioButton;
-import javax.swing.JPasswordField;
-import java.awt.FlowLayout;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.BoxLayout;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.GridBagLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.lukascode.jmail.common.Main;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Level;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.ImageIcon;
-import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.awt.event.ActionEvent;
+import javax.swing.border.EmptyBorder;
+
+import com.lukascode.jmail.common.Main;
+import com.lukascode.jmail.views.helpers.Resources;
 
 public class AppFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTabbedPane tabbedPaneAccounts;
 	private JMenuItem mntmAbout;
@@ -72,7 +62,7 @@ public class AppFrame extends JFrame {
 	}
 	
 	public void initComponents() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AppFrame.class.getResource("/icons/email.png")));
+		setIconImage(Resources.getImage("/icons/email.png"));
 		setTitle("JMail Client");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1149, 751);
@@ -85,12 +75,12 @@ public class AppFrame extends JFrame {
 		
 		mntmShowStartWindow = new JMenuItem("Show start window");
 		
-		mntmShowStartWindow.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/route.png")));
+		mntmShowStartWindow.setIcon(Resources.getIcon("/icons/route.png"));
 		menuFile.add(mntmShowStartWindow);
 		
 		mntmFinish = new JMenuItem("Exit");
 		
-		mntmFinish.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/exit.png")));
+		mntmFinish.setIcon(Resources.getIcon("/icons/exit.png"));
 		menuFile.add(mntmFinish);
 		
 		JMenu mnHelp = new JMenu("Help");
@@ -98,7 +88,7 @@ public class AppFrame extends JFrame {
 		
 		mntmAbout = new JMenuItem("About");
 		
-		mntmAbout.setIcon(new ImageIcon(AppFrame.class.getResource("/icons/about.png")));
+		mntmAbout.setIcon(Resources.getIcon("/icons/about.png"));
 		mnHelp.add(mntmAbout);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -146,6 +136,13 @@ public class AppFrame extends JFrame {
 	public void addTab(JPanel panel, String title) {
 		tabbedPaneAccounts.addTab(title, panel);
 		tabbedPaneAccounts.setBackground(Color.BLUE);
+	}
+	
+	public void removeTab(JPanel panel) {
+		tabbedPaneAccounts.remove(panel);
+		if(tabbedPaneAccounts.getTabCount() == 0) {
+			AppFrame.this.dispose();
+		}
 	}
 	
 	

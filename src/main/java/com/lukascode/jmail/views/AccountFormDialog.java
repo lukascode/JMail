@@ -27,9 +27,14 @@ import javax.swing.border.EmptyBorder;
 
 import com.lukascode.jmail.common.AccountConfiguration;
 import com.lukascode.jmail.common.Main;
+import com.lukascode.jmail.views.helpers.Resources;
 
 public class AccountFormDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JButton cancelButton;
 	private JButton okButton;
@@ -88,7 +93,7 @@ public class AccountFormDialog extends JDialog {
 	}
 	
 	public void initComponents() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AccountFormDialog.class.getResource("/icons/email.png")));
+		setIconImage(Resources.getImage("/icons/email.png"));
 		setTitle("Account Configuration");
 		setBounds(100, 100, 850, 542);
 		getContentPane().setLayout(new BorderLayout());

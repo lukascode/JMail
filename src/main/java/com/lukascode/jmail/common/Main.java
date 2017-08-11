@@ -19,7 +19,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import com.lukascode.jmail.common.dao.JMailDatabaseCreator;
 import com.lukascode.jmail.views.MessageViewer;
@@ -186,9 +185,10 @@ public class Main {
 	
 	public static Logger logger;
 	
-	public final static String APP_FOLDER = System.getProperty("user.home")+ "\\.jmail";
+	public final static String APP_FOLDER = System.getProperty("user.home")+ "/.jmail";
 	
 	static {
+		System.out.println("AppFolder: " + APP_FOLDER);
 		//Create app folder in home directory
 		File dir = new File(APP_FOLDER);
 		if(!dir.exists()) {

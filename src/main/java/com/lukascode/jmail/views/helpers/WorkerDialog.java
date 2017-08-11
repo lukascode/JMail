@@ -17,7 +17,7 @@ import javax.swing.SwingWorker;
 
 import com.lukascode.jmail.common.Main;
 
-public abstract class WorkerDialog extends SwingWorker {
+public abstract class WorkerDialog extends SwingWorker<Object, Object> {
 	
 	private Object result;
 
