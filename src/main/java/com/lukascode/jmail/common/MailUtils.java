@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import javax.mail.Address;
 import javax.mail.Authenticator;
+import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -78,8 +79,43 @@ public class MailUtils {
 		return stree;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<EMessage> getMessages(String folder) {
-		List<EMessage> messages = new ArrayList<>();
+		Runnable<Object> runnable = new Runnable<Object>() {
+			@Override
+			public Object run(Object arg1, Object arg2) throws Exception {
+				List<EMessage> messages = new ArrayList<>();
+				Message[] msgs = ((IMAPFolder) arg1).getMessages();
+				for(Message m: msgs) { 
+					messages.add(new EMessage(m));
+				}
+				return messages;
+			}
+		};
+		return (List<EMessage>) prepareForImap(runnable, folder, null);
+	}
+	
+	public void removeMessage2(Message m) {
+		
+		Runnable<Object> runnable = new Runnable<Object>() {
+			@Override
+			public Object run(Object arg1, Object arg2) throws Exception {
+				Message m = (Message)arg2;
+				if(!m.getFolder().isOpen()) m.getFolder().open(Folder.READ_WRITE);
+				m.setFlag(Flags.Flag.DELETED, true);
+				return null;
+			}
+		};
+		prepareForImap(runnable, m.getFolder().getFullName(), m);
+	}
+	
+	public void removeMessage(Message m) throws MessagingException {
+		if(!m.getFolder().isOpen()) m.getFolder().open(Folder.READ_WRITE);
+			m.setFlag(Flags.Flag.DELETED, true);
+	}
+	
+	private Object prepareForImap(Runnable<Object> runnable, String folder, Object additional) {
+		Object result = null;
 		Session session = getIMAPSession();
 		Store store = null;
 		IMAPFolder _folder = null;
@@ -90,11 +126,10 @@ public class MailUtils {
 			store.connect(ac.getImapServerName(), ac.getEmail(), ac.getPassword());
 			 _folder = (IMAPFolder) store.getFolder(folder);
 			_folder.open(Folder.READ_WRITE);
-			Message[] msgs = _folder.getMessages();
-			for(Message m: msgs) messages.add(createEMessage(m));
+			result = runnable.run(_folder, additional);
 		} catch(Exception e) {
 			Main.logger.log(Level.SEVERE, "exception was thrown", e);
-			throw new JMailException("Can not retrieve messages from server\n" + e.getMessage());
+			throw new JMailException("Can not retrieve messages from server\n" + e.getMessage(), e);
 		} finally {
 			try {
 				if(_folder != null && _folder.isOpen()) _folder.close(false);
@@ -102,24 +137,6 @@ public class MailUtils {
 			} catch(Exception e) {
 				Main.logger.log(Level.SEVERE, "exception was thrown", e);
 			}
-		}
-		return messages;
-	}
-	
-	private EMessage createEMessage(Message m) {
-		EMessage result = new EMessage();
-		try {
-			result.setSubject(m.getSubject());
-			result.setDate(m.getReceivedDate());
-			Address[] addrs = null;
-			addrs = m.getAllRecipients();
-			String email = addrs == null ? null : ((InternetAddress) addrs[0]).getAddress();
-			result.setTo(email);
-			addrs = m.getFrom();
-			email = addrs == null ? null : ((InternetAddress) addrs[0]).getAddress();
-			result.setFrom(email);
-		} catch(Exception e) {
-			Main.logger.log(Level.SEVERE, "exception was thrown", e);
 		}
 		return result;
 	}
@@ -171,4 +188,9 @@ public class MailUtils {
 		return session;
 	}
 	
+}
+
+@FunctionalInterface
+interface Runnable<T> {
+	T run(T arg1, T arg2)  throws Exception;
 }
