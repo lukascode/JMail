@@ -1,8 +1,10 @@
 package com.lukascode.jmail.views.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import javax.mail.Flags;
 import javax.mail.MessagingException;
 import javax.swing.table.AbstractTableModel;
 
@@ -24,6 +26,16 @@ public class MessagesTableModel extends AbstractTableModel {
 			this.selected = false;
 		}
 	}
+	
+	public void sort() {
+		messages.sort(new Comparator<EMessageTableElement>() {
+			@Override
+			public int compare(EMessageTableElement o1, EMessageTableElement o2) {
+				return o2.message.getDate().compareTo(o1.message.getDate());
+			}
+		});
+	}
+	
 	/**
 	 * 
 	 */
@@ -34,12 +46,14 @@ public class MessagesTableModel extends AbstractTableModel {
 	public MessagesTableModel(List<EMessageTableElement> messages, MailUtils mu) {
 		this.mu = mu;
 		this.messages = messages;
+		sort();
 	}
 	
 	public MessagesTableModel(MailUtils mu, List<EMessage> messages) {
 		this.mu = mu;
 		this.messages = new ArrayList<>();
 		for(EMessage m: messages) this.messages.add(new EMessageTableElement(m, false));
+		sort();
 	}
 	
 	public MessagesTableModel(MailUtils mu) {
@@ -49,6 +63,7 @@ public class MessagesTableModel extends AbstractTableModel {
 	
 	public void addRow(EMessage m, boolean selected) {
 		messages.add(new EMessageTableElement(m, selected));
+		sort();
 		fireTableRowsInserted(messages.size()-1, messages.size()-1);
 	}
 
@@ -76,6 +91,7 @@ public class MessagesTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		if(rowIndex >= messages.size()) return null;
 		EMessageTableElement message = messages.get(rowIndex);
 		switch(columnIndex) {
 			case 0:
@@ -90,7 +106,7 @@ public class MessagesTableModel extends AbstractTableModel {
 				return message.message.getSubject();
 			
 			case 4: 
-				return message.message.getDate().toString();
+				return message.message.getFormattedDate();
 		}
 		return null;
 	}

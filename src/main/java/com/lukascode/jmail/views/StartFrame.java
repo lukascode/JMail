@@ -118,7 +118,7 @@ public class StartFrame extends JFrame {
 					JOptionPane.showMessageDialog(StartFrame.this, e.toString(), "JMail Error", JOptionPane.ERROR_MESSAGE);
 				}
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(1500);
 				} catch (InterruptedException e1) {
 					Main.logger.log(Level.SEVERE, "Thread.sleep error", e1);
 				} finally {

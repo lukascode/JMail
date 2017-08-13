@@ -1,11 +1,11 @@
 package com.lukascode.jmail.common.dao;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 
 import javax.mail.Address;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 
 import com.lukascode.jmail.common.Main;
@@ -60,13 +60,7 @@ public class EMessage {
 		this.to = to;
 	}
 	public String getSubject() {
-		try {
-			return message.getSubject();
-		} catch (MessagingException e) {
-			Main.logger.log(Level.SEVERE, "Emessage.getSubject error", e);
-		}
-		return "";
-		//return subject;
+		return subject;
 	}
 	public void setSubject(String subject) {
 		this.subject = subject;
@@ -76,6 +70,11 @@ public class EMessage {
 	}
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	
+	public String getFormattedDate() {
+		SimpleDateFormat sdf = new SimpleDateFormat("E dd.MM.yyyy hh:mm:ss");
+		return sdf.format(date);
 	}
 	
 }

@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -14,6 +16,7 @@ import javax.mail.MessagingException;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,13 +39,10 @@ import com.lukascode.jmail.common.MailUtils;
 import com.lukascode.jmail.common.Main;
 import com.lukascode.jmail.common.StringTree;
 import com.lukascode.jmail.common.dao.EMessage;
-import com.lukascode.jmail.views.helpers.AccountsTableModel;
+import com.lukascode.jmail.views.helpers.CellRenderer;
 import com.lukascode.jmail.views.helpers.FolderTreeModel;
 import com.lukascode.jmail.views.helpers.MessagesTableModel;
 import com.lukascode.jmail.views.helpers.WorkerDialog;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JCheckBox;
 
 public class MailContentViewerPanel extends JPanel {
 
@@ -283,9 +283,10 @@ public class MailContentViewerPanel extends JPanel {
 					protected Object doInBackground() {
 						try {
 							tableMessages.setModel(new MessagesTableModel(mailUtils, getMessagesSmart(path)));
+							tableMessages.getColumnModel().getColumn(2).setCellRenderer(new CellRenderer());
 						} catch (JMailException e) {
 							Main.logger.log(Level.SEVERE, e.getMessage());
-							JOptionPane.showMessageDialog(topFrame, e.getMessage(), "JMailError",
+							JOptionPane.showMessageDialog(topFrame, e.getMessage(), "Retriving messages error",
 									JOptionPane.ERROR_MESSAGE);
 						}
 						return null;

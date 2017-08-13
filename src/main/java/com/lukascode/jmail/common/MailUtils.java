@@ -112,6 +112,14 @@ public class MailUtils {
 	public void removeMessage(Message m) throws MessagingException {
 		if(!m.getFolder().isOpen()) m.getFolder().open(Folder.READ_WRITE);
 			m.setFlag(Flags.Flag.DELETED, true);
+			m.getFolder().close(true);
+	}
+	
+	public boolean isSeen(Message m) throws MessagingException {
+		if(!m.getFolder().isOpen()) m.getFolder().open(Folder.READ_WRITE);
+		boolean result = m.isSet(Flags.Flag.SEEN);
+		m.getFolder().close(false);
+		return result;
 	}
 	
 	private Object prepareForImap(Runnable<Object> runnable, String folder, Object additional) {
